@@ -1,18 +1,35 @@
 import { useAccount } from "@/libs/hooks/useAccount";
 import { formatDate } from "@/libs/utils/format-date";
 import { Card, Badge, CardMedia, Box, Typography, Button } from "@mui/material";
+import { useState } from "react";
 import { Link } from "react-router";
 
 type Props = {
   activity: Activity;
+  updateActivity: ({
+    id,
+    activity,
+  }: {
+    id: string;
+    activity: Activity;
+  }) => void;
 };
 
-export default function ActivityDetailsHeader({ activity }: Props) {
+export default function ActivityDetailsHeader({
+  activity,
+  updateActivity,
+}: Props) {
   const { user } = useAccount();
-  const isCancelled = activity.isCanceled;
+  const [isCancelled, setIsCancelled] = useState(activity.isCancelled || false);
   const isHost = activity.hostId === user?.id;
   const isGoing = activity.attendees.some((a) => a.id === user?.id);
   const loading = false;
+
+  const handleIsCancelled = () => {
+    setIsCancelled(!isCancelled);
+    const updatedActivity = { ...activity, isCancelled: !isCancelled };
+    updateActivity({ id: activity.id, activity: updatedActivity });
+  };
 
   return (
     <Card
@@ -83,7 +100,7 @@ export default function ActivityDetailsHeader({ activity }: Props) {
               <Button
                 variant="contained"
                 color={isCancelled ? "success" : "error"}
-                onClick={() => {}}
+                onClick={handleIsCancelled}
               >
                 {isCancelled ? "Re-activate Activity" : "Cancel Activity"}
               </Button>

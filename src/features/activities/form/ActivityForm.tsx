@@ -51,14 +51,12 @@ export default function ActivityForm({}: Props) {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const activityData = { ...formValue };
-    console.log(activityData);
 
     if (isEdit) {
       updateActivity(
         { id: id!, activity: activityData as unknown as Activity },
         {
           onSuccess: () => {
-            console.log("Activity updated successfully");
             navigate("/activities");
           },
           onError: (error, variable, context) => {
@@ -69,7 +67,6 @@ export default function ActivityForm({}: Props) {
     } else {
       createActivity(activityData as unknown as Activity, {
         onSuccess: () => {
-          console.log("Activity created successfully");
           navigate("/activities");
         },
         onError: (error, variable, context) => {

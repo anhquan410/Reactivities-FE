@@ -26,7 +26,7 @@ export default function UserMenu() {
 
   const handleClose = () => {
     setAnchorEl(null);
-    navigate("/activities");
+    // navigate("/activities");
   };
 
   return (
@@ -73,6 +73,7 @@ export default function UserMenu() {
           onClick={() => {
             logoutUser.mutate();
             handleClose();
+            navigate("/");
           }}
         >
           <ListItemIcon>

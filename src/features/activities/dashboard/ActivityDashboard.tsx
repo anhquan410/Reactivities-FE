@@ -5,7 +5,6 @@ import { useActivities } from "@/libs/hooks/useActivities";
 
 export default function ActivityDashboard() {
   const { activities } = useActivities();
-  // console.log(activities);
 
   return (
     <Grid2 container spacing={3}>

@@ -19,12 +19,11 @@ type Props = {
 
 export default function ActivityCard({ activity }: Props) {
   const { isHost, isGoing } = activity;
-  const isCancelled = activity.isCanceled;
+  const isCancelled = activity.isCancelled;
   const label = isHost ? "You are hosting" : "You are going";
   const color = isHost ? "secondary" : isGoing ? "warning" : "default";
 
   if (!activity) return null;
-  // console.log(activity);
 
   return (
     <Card elevation={3} sx={{ borderRadius: 3 }}>
@@ -78,7 +77,6 @@ export default function ActivityCard({ activity }: Props) {
           sx={{ backgroundColor: "grey.200", py: 3, pl: 3 }}
         >
           {activity.attendees.map((attendee) => {
-            // console.log(attendee);
             return (
               <Avatar
                 key={attendee.id}

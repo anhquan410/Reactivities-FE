@@ -8,7 +8,7 @@ import { useActivities } from "@/libs/hooks/useActivities";
 
 export default function ActivityDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { activity, isLoadingActivity } = useActivities(id);
+  const { activity, isLoadingActivity, updateActivity } = useActivities(id);
 
   if (isLoadingActivity) return <Typography>Loading...</Typography>;
 
@@ -17,12 +17,15 @@ export default function ActivityDetailPage() {
   return (
     <Grid2 container spacing={3}>
       <Grid2 size={8}>
-        <ActivityDetailsHeader activity={activity} />
+        <ActivityDetailsHeader
+          activity={activity}
+          updateActivity={updateActivity}
+        />
         <ActivityDetailsInfo activity={activity} />
         <ActivityDetailsChat />
       </Grid2>
       <Grid2 size={4}>
-        <ActivityDetailsSidebar />
+        <ActivityDetailsSidebar activity={activity} />
       </Grid2>
     </Grid2>
   );

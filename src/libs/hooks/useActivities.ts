@@ -57,6 +57,9 @@ export const useActivities = (id?: string) => {
         updateActivityApi(id, activity),
       onSuccess: () => {
         queryClient.invalidateQueries({ queryKey: activityQueryKeys.list });
+        queryClient.invalidateQueries({
+          queryKey: activityQueryKeys.details(id),
+        });
       },
     }
   );

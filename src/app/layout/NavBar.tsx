@@ -14,7 +14,6 @@ import UserMenu from "./UserMenu";
 export default function NavBar() {
   const { user } = useAccount();
 
-  // console.log(user);
 
   return (
     <Box sx={{ flexGrow: 1 }}>

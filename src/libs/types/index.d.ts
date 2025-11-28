@@ -5,7 +5,7 @@ type Activity = {
   title: string;
   description: string;
   category: string;
-  isCanceled: boolean;
+  isCancelled: boolean;
   city: string;
   venue: string;
   latitude: number;

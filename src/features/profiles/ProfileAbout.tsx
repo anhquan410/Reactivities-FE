@@ -1,4 +1,4 @@
-import { Button, Grid2, Paper } from "@mui/material";
+import { Button, Grid2, Paper, Typography } from "@mui/material";
 import { Link } from "react-router";
 
 type Props = {
@@ -9,7 +9,7 @@ type Props = {
 export default function ProfileAbout({ profile, isOwnProfile }: Props) {
   return (
     <Paper elevation={3} sx={{ p: 3, borderRadius: 3 }}>
-      <Grid2>
+      <Grid2 sx={{ mb: 3 }}>
         {isOwnProfile && (
           <Button
             variant="outlined"
@@ -22,9 +22,15 @@ export default function ProfileAbout({ profile, isOwnProfile }: Props) {
         )}
       </Grid2>
       <Grid2 size={8}>
-        <h2>Information about me</h2>
-        <p>Name: {profile.displayName}</p>
-        <p>Email: {profile.email}</p>
+        <Typography variant="h5" sx={{ mb: 2 }}>
+          INFORMATION
+        </Typography>
+        <Typography variant="body1" sx={{ mb: 1 }}>
+          <strong>Name:</strong> {profile.displayName}
+        </Typography>
+        <Typography variant="body1">
+          <strong>Email:</strong> {profile.email}
+        </Typography>
       </Grid2>
     </Paper>
   );
