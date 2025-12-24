@@ -41,14 +41,12 @@ type Photo = {
   id: string;
   url: string;
   isMain: boolean;
-  publicId: string;
-  userId: string;
 };
 
 type Profile = User & {
-  email: string;
-  photos: Photo[];
-  followersCount: number;
-  followingCount: number;
-  following: boolean;
+  email?: string;
+  photos?: Photo[];
+  followersCount?: number;
+  followingCount?: number;
+  following?: boolean;
 };

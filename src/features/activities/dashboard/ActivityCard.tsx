@@ -1,4 +1,6 @@
+// import ProfileCard from "@/features/profiles/ProfileCard";
 import { formatDate } from "@/libs/utils/format-date";
+import AvatarPopover from "@/shared/components/AvatarPopover";
 import { AccessTime, Place } from "@mui/icons-material";
 import {
   Avatar,
@@ -48,10 +50,20 @@ export default function ActivityCard({ activity }: Props) {
         />
         <Box display="flex" flexDirection="column" gap={2} mr={2}>
           {(isHost || isGoing) && (
-            <Chip label={label} color={color} sx={{ borderRadius: 2 }} />
+            <Chip
+              label={label}
+              color={color}
+              sx={{ borderRadius: 2 }}
+              variant="outlined"
+            />
           )}
           {isCancelled && (
-            <Chip label="Cancelled" color="error" sx={{ borderRadius: 2 }} />
+            <Chip
+              label="Cancelled"
+              color="error"
+              sx={{ borderRadius: 2 }}
+              variant="outlined"
+            />
           )}
         </Box>
       </Box>
@@ -76,18 +88,10 @@ export default function ActivityCard({ activity }: Props) {
           gap={2}
           sx={{ backgroundColor: "grey.200", py: 3, pl: 3 }}
         >
-          {activity.attendees.map((attendee) => {
-            return (
-              <Avatar
-                key={attendee.id}
-                alt={attendee.displayName}
-                src={attendee.imageUrl}
-                sx={{ width: 24, height: 24 }}
-                component={Link}
-                to={`/profiles/${attendee.id}`}
-              />
-            );
-          })}
+          {activity.attendees.map((attendee) => (
+            // <ProfileCard key={attendee.id} profile={attendee} />
+            <AvatarPopover key={attendee.id} profile={attendee} />
+          ))}
         </Box>
       </CardContent>
       <CardContent sx={{ pb: 2 }}>
