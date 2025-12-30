@@ -44,3 +44,12 @@ export async function deleteActivity(id: string) {
     console.log(error);
   }
 }
+
+export async function updateAttendee(id: string) {
+  try {
+    const response = await agent.post(`/activities/${id}/attend`);
+    return response.data;
+  } catch (error) {
+    console.log(error);
+  }
+}

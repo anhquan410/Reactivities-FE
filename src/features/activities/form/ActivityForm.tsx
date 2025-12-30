@@ -57,7 +57,7 @@ export default function ActivityForm({}: Props) {
         { id: id!, activity: activityData as unknown as Activity },
         {
           onSuccess: () => {
-            navigate("/activities");
+            navigate(`/activities/${id}`);
           },
           onError: (error, variable, context) => {
             console.log(error, variable, context);

@@ -1,35 +1,17 @@
-import { useAccount } from "@/libs/hooks/useAccount";
+import { useActivities } from "@/libs/hooks/useActivities";
 import { formatDate } from "@/libs/utils/format-date";
-import { Card, Badge, CardMedia, Box, Typography, Button } from "@mui/material";
-import { useState } from "react";
+import StyledButton from "@/shared/components/StyledButton";
+import { Card, Badge, CardMedia, Box, Typography } from "@mui/material";
 import { Link } from "react-router";
 
 type Props = {
   activity: Activity;
-  updateActivity: ({
-    id,
-    activity,
-  }: {
-    id: string;
-    activity: Activity;
-  }) => void;
 };
 
-export default function ActivityDetailsHeader({
-  activity,
-  updateActivity,
-}: Props) {
-  const { user } = useAccount();
-  const [isCancelled, setIsCancelled] = useState(activity.isCancelled || false);
-  const isHost = activity.hostId === user?.id;
-  const isGoing = activity.attendees.some((a) => a.id === user?.id);
-  const loading = false;
-
-  const handleIsCancelled = () => {
-    setIsCancelled(!isCancelled);
-    const updatedActivity = { ...activity, isCancelled: !isCancelled };
-    updateActivity({ id: activity.id, activity: updatedActivity });
-  };
+export default function ActivityDetailsHeader({ activity }: Props) {
+  const { updateAttendee, isUpdatingAttendee } = useActivities(activity.id);
+  // console.log(activity);
+  // console.log(profile);
 
   return (
     <Card
@@ -40,7 +22,7 @@ export default function ActivityDetailsHeader({
         overflow: "hidden",
       }}
     >
-      {isCancelled && (
+      {activity.isCancelled && (
         <Badge
           sx={{ position: "absolute", left: 40, top: 20, zIndex: 1000 }}
           color="error"
@@ -93,36 +75,42 @@ export default function ActivityDetailsHeader({
           </Typography>
         </Box>
 
-        {/* Buttons aligned to the right */}
+        {/* StyledButtons aligned to the right */}
         <Box sx={{ display: "flex", gap: 2 }}>
-          {isHost ? (
+          {activity.isHost ? (
             <>
-              <Button
+              <StyledButton
                 variant="contained"
-                color={isCancelled ? "success" : "error"}
-                onClick={handleIsCancelled}
+                color={activity.isCancelled ? "success" : "error"}
+                onClick={() => updateAttendee(activity.id)}
+                disabled={isUpdatingAttendee}
+                loading={isUpdatingAttendee}
               >
-                {isCancelled ? "Re-activate Activity" : "Cancel Activity"}
-              </Button>
-              <Button
+                {activity.isCancelled
+                  ? "Re-activate Activity"
+                  : "Cancel Activity"}
+              </StyledButton>
+              <StyledButton
                 variant="contained"
                 color="primary"
                 component={Link}
                 to={`/manage/${activity.id}`}
-                disabled={isCancelled}
+                disabled={activity.isCancelled || isUpdatingAttendee}
+                loading={isUpdatingAttendee}
               >
                 Manage Event
-              </Button>
+              </StyledButton>
             </>
           ) : (
-            <Button
+            <StyledButton
               variant="contained"
-              color={isGoing ? "primary" : "info"}
-              onClick={() => {}}
-              disabled={isCancelled || loading}
+              color={activity.isGoing ? "error" : "success"}
+              onClick={() => updateAttendee(activity.id)}
+              disabled={activity.isCancelled || isUpdatingAttendee}
+              loading={isUpdatingAttendee}
             >
-              {isGoing ? "Cancel Attendance" : "Join Activity"}
-            </Button>
+              {activity.isGoing ? "Cancel Attendance" : "Join Activity"}
+            </StyledButton>
           )}
         </Box>
       </Box>

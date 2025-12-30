@@ -34,7 +34,7 @@ type User = {
 
 type Attendee = User & {
   isHost: boolean;
-  following: boolean;
+  // following: boolean;
 };
 
 type Photo = {

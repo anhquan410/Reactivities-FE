@@ -10,6 +10,7 @@ import {
   Grid2,
 } from "@mui/material";
 import { Link } from "react-router";
+import pluralize from "pluralize";
 
 type Props = {
   // Define the type for activity if needed
@@ -17,8 +18,8 @@ type Props = {
 };
 
 export default function ActivityDetailsSidebar({ activity }: Props) {
-  console.log(activity);
-  // const following = true;
+  // console.log(activity);
+  const following = true;
   return (
     <>
       <Paper
@@ -31,61 +32,55 @@ export default function ActivityDetailsSidebar({ activity }: Props) {
         }}
       >
         <Typography variant="h6">
-          {activity.attendees.length} people going
+          {activity.attendees.length}{" "}
+          {pluralize("person", activity.attendees.length)} going
         </Typography>
       </Paper>
       <Paper sx={{ padding: 2 }}>
-        <Grid2 container alignItems="center">
-          <Grid2 size={8}>
-            <List sx={{ display: "flex", flexDirection: "column" }}>
-              {activity.attendees.map((attendee) => (
-                <ListItem
-                  key={attendee.id}
-                  component={Link}
-                  to={`/profiles/${attendee.id}`}
-                >
+        {activity.attendees.map((attendee) => (
+          <Grid2 key={attendee.id} container alignItems="center">
+            <Grid2 size={8}>
+              <List sx={{ display: "flex", flexDirection: "column" }}>
+                <ListItem component={Link} to={`/profiles/${attendee.id}`} sx={{ textDecoration: "none", color: "inherit" }}>
                   <ListItemAvatar>
-                    <Avatar alt={"attendee name"} src={attendee.imageUrl} />
+                    <Avatar
+                      variant="rounded"
+                      alt={attendee.displayName + " image"}
+                      src={attendee.imageUrl}
+                      sx={{ width: 75, height: 75, mr: 3 }}
+                    />
                   </ListItemAvatar>
                   <ListItemText>
                     <Typography variant="h6">{attendee.displayName}</Typography>
+                    {following && (
+                      <Typography variant="body2" color="orange">
+                        Following
+                      </Typography>
+                    )}
                   </ListItemText>
-                  {attendee.isHost && (
-                    <Chip
-                      label="Host"
-                      color="warning"
-                      variant="filled"
-                      sx={{ borderRadius: 2 }}
-                    />
-                  )}
                 </ListItem>
-              ))}
-            </List>
+              </List>
+            </Grid2>
+            <Grid2
+              size={4}
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-end",
+                gap: 1,
+              }}
+            >
+              {activity.hostId === attendee.id && (
+                <Chip
+                  label="Host"
+                  color="warning"
+                  variant="filled"
+                  sx={{ borderRadius: 2 }}
+                />
+              )}
+            </Grid2>
           </Grid2>
-          <Grid2
-            size={4}
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "flex-end",
-              gap: 1,
-            }}
-          >
-            {/* {isHost && (
-              <Chip
-                label="Host"
-                color="warning"
-                variant="filled"
-                sx={{ borderRadius: 2 }}
-              />
-            )}
-            {following && (
-              <Typography variant="body2" color="orange">
-                Following
-              </Typography>
-            )} */}
-          </Grid2>
-        </Grid2>
+        ))}
       </Paper>
     </>
   );
