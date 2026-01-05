@@ -39,11 +39,15 @@
 
 - Trong profile:
   - [x] Phần Header, show data của user
-  - [ ] Phần About, show data của user,
+  - [x] Phần About, show data của user,
         Thêm nút Edit => bấm Edit show form to edit => Cancel/Save
-  - [ ] Phần Photo, show data
+  - [x] Phần Photo, show data
         Add Photo, Delete Photo
   - [ ] Phần Following, show data
   - [ ] Phần Follower, show data
 
 // 4
+
+- [ ] Profile Photos:
+  - [x] Set main photo (use optimistic update) + update avatar on header
+  - [x] Delete photo - can not delete main photo + use optimistic update - API: DELETE /api/profiles/photo/:photoId

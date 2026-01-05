@@ -7,43 +7,81 @@ import {
   ImageListItem,
   Typography,
 } from "@mui/material";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { useProfile } from "@/libs/hooks/useProfiile";
+import PhotoUploadWidget from "@/shared/components/PhotoUploadWidget";
+import StarButton from "@/shared/components/StartButton";
+import DeleteButton from "@/shared/components/DEleteButton";
 
 export default function ProfilePhotos() {
   const { id } = useParams();
+  const { photos, isCurrentUser, uploadPhoto, setMainPhoto, deletePhoto } =
+    useProfile(id);
 
   const [editMode, setEditMode] = useState(false);
+
+  const handleUpload = useCallback(
+    async (file: Blob) => {
+      await uploadPhoto(file, {
+        onSuccess: () => {
+          setEditMode(false);
+        },
+      });
+    },
+    [uploadPhoto]
+  );
+
+  const handleDelete = (photoId: string) => {
+    deletePhoto(photoId);
+  };
 
   return (
     <Box>
       <Box display="flex" justifyContent="space-between">
         <Typography variant="h5">Photos</Typography>
 
-        <Button onClick={() => setEditMode(!editMode)}>
-          {editMode ? "Cancel" : "Add photo"}
-        </Button>
+        {isCurrentUser && (
+          <Button onClick={() => setEditMode(!editMode)}>
+            {editMode ? "Cancel" : "Add photo"}
+          </Button>
+        )}
       </Box>
       <Divider sx={{ my: 2 }} />
 
       <Box>
-        <ImageList sx={{ height: 450 }} cols={6} rowHeight={164}>
-          <>
-            {Array.from({ length: 5 }).map((_, index) => (
-              <ImageListItem key={index}>
-                <img
-                  alt={"user profile image"}
-                  src={`https://picsum.photos/200/200?random=${index}`}
-                />
+        {editMode ? (
+          <PhotoUploadWidget onUpload={handleUpload} />
+        ) : (
+          <ImageList sx={{ height: 450 }} cols={6} rowHeight={164}>
+            <>
+              {photos?.map((photo) => (
+                <ImageListItem key={photo.id}>
+                  <img alt={"user profile image"} src={photo.url} />
 
-                <div>
-                  <Box sx={{ position: "absolute", top: 0, left: 0 }}></Box>
+                  {isCurrentUser && (
+                    <Box
+                      sx={{ position: "absolute", top: 0, left: 0 }}
+                      onClick={() => {
+                        setMainPhoto(photo.id);
+                      }}
+                    >
+                      <StarButton selected={photo.isMain} />
+                    </Box>
+                  )}
 
-                  <Box sx={{ position: "absolute", top: 0, right: 0 }}></Box>
-                </div>
-              </ImageListItem>
-            ))}
-          </>
-        </ImageList>
+                  {isCurrentUser && !photo.isMain && (
+                    <Box
+                      sx={{ position: "absolute", top: 0, right: 0 }}
+                      onClick={() => handleDelete(photo.id)}
+                    >
+                      <DeleteButton />
+                    </Box>
+                  )}
+                </ImageListItem>
+              ))}
+            </>
+          </ImageList>
+        )}
       </Box>
     </Box>
   );

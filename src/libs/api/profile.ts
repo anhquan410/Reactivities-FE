@@ -17,3 +17,8 @@ export async function updateProfile(id: string, profile: Profile) {
     console.log(error);
   }
 }
+
+export async function getProfilePhotos(id: string) {
+  const response = await agent.get<Photo[]>(`/profiles/${id}/photos`);
+  return response.data;
+}

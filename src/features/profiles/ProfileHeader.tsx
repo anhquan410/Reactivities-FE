@@ -1,3 +1,4 @@
+import { useAccount } from "@/libs/hooks/useAccount";
 import {
   Avatar,
   Box,
@@ -15,7 +16,9 @@ type Props = {
 };
 
 export default function ProfileHeader({ profile }: Props) {
+  const { user } = useAccount();
   const isFollowing = profile.following;
+
   return (
     <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
       <Grid2 container spacing={2}>
@@ -52,13 +55,15 @@ export default function ProfileHeader({ profile }: Props) {
               </Box>
             </Box>
             <Divider sx={{ width: "100%" }} />
-            <Button
-              fullWidth
-              variant="outlined"
-              color={isFollowing ? "error" : "success"}
-            >
-              {isFollowing ? "Unfollow" : "Follow"}
-            </Button>
+            {user?.id !== profile.id && (
+              <Button
+                fullWidth
+                variant="outlined"
+                color={isFollowing ? "error" : "success"}
+              >
+                {isFollowing ? "Unfollow" : "Follow"}
+              </Button>
+            )}
           </Stack>
         </Grid2>
       </Grid2>

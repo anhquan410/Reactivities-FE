@@ -1,6 +1,11 @@
 import agent from "@/libs/api/agent";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+export const ACCOUNT_QUERY_KEY = {
+  all: ["account"],
+  user: () => [...ACCOUNT_QUERY_KEY.all],
+} as const;
+
 export const useAccount = () => {
   const queryClient = useQueryClient();
 
@@ -9,9 +14,9 @@ export const useAccount = () => {
       const response = await agent.post("/auth/login", credentials);
       return response.data;
     },
-    // onSuccess: async () => {
-    //   queryClient.invalidateQueries({ queryKey: ["user"] });
-    // },
+    onSuccess: async () => {
+      queryClient.invalidateQueries({ queryKey: ACCOUNT_QUERY_KEY.user() });
+    },
   });
 
   const registerUser = useMutation({
@@ -31,12 +36,12 @@ export const useAccount = () => {
       return response.data;
     },
     onSuccess: async () => {
-      queryClient.removeQueries({ queryKey: ["user"] });
+      queryClient.removeQueries({ queryKey: ACCOUNT_QUERY_KEY.user() });
     },
   });
 
   const { data: user, isLoading: isLoadingUser } = useQuery({
-    queryKey: ["user"],
+    queryKey: ACCOUNT_QUERY_KEY.user(),
     queryFn: async () => {
       const response = await agent.get<User>("/auth/profile");
       return response.data;
