@@ -1,4 +1,5 @@
 import { useAccount } from "@/libs/hooks/useAccount";
+import { useProfile } from "@/libs/hooks/useProfiile";
 import {
   Avatar,
   Box,
@@ -18,6 +19,13 @@ type Props = {
 export default function ProfileHeader({ profile }: Props) {
   const { user } = useAccount();
   const isFollowing = profile.following;
+  const { followUser } = useProfile(profile.id);
+  const handleFollowing = (profileId: string) => {
+    followUser(profileId);
+  };
+
+  // console.log("user", user);
+  // console.log("profile", profile);
 
   return (
     <Paper elevation={3} sx={{ p: 4, borderRadius: 3 }}>
@@ -60,6 +68,7 @@ export default function ProfileHeader({ profile }: Props) {
                 fullWidth
                 variant="outlined"
                 color={isFollowing ? "error" : "success"}
+                onClick={() => handleFollowing(profile.id)}
               >
                 {isFollowing ? "Unfollow" : "Follow"}
               </Button>

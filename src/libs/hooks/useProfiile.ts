@@ -4,6 +4,7 @@ import { updateProfile as updateProfileApi } from "@/libs/api/profile";
 import { ACCOUNT_QUERY_KEY } from "./useAccount";
 import { useMemo } from "react";
 import agent from "../api/agent";
+import { ACTIVITY_QUERY_KEY } from "./useActivities";
 
 const PROFILE_QUERY_KEY = {
   all: ["profiles"],
@@ -38,6 +39,7 @@ export const useProfile = (id?: string) => {
     queryFn: () => getProfilePhotos(id as string),
     enabled: !!id,
   });
+
   const { mutateAsync: uploadPhoto, isPending: isUploadingPhoto } = useMutation(
     {
       mutationFn: async (file: Blob) => {
@@ -64,15 +66,22 @@ export const useProfile = (id?: string) => {
       const response = await agent.put(`/profiles/photo/${id}/main`);
       return response.data;
     },
+ 
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: PROFILE_QUERY_KEY.all,
+        queryKey: PROFILE_QUERY_KEY.photos(id as string),
       });
       await queryClient.invalidateQueries({
         queryKey: PROFILE_QUERY_KEY.profile(id as string),
       });
       await queryClient.invalidateQueries({
         queryKey: ACCOUNT_QUERY_KEY.user(),
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ACTIVITY_QUERY_KEY.lists(),
+      });
+      await queryClient.refetchQueries({
+        queryKey: ACTIVITY_QUERY_KEY.lists(),
       });
     },
   });
@@ -95,6 +104,41 @@ export const useProfile = (id?: string) => {
     },
   });
 
+  const { mutate: followUser, isPending: isFollowingUser } = useMutation({
+    mutationFn: async (id: string) => {
+      const response = await agent.post(`/profiles/${id}/follow`);
+      return response.data;
+    },
+    onMutate: async (id: string) => {
+      const key = PROFILE_QUERY_KEY.profile(id);
+      await queryClient.cancelQueries({ queryKey: key });
+      const previousProfile = queryClient.getQueryData<Profile>(key);
+
+      queryClient.setQueryData(key, (data: Profile) => {
+        if (!data || !user) return null;
+        const isFollowing = data.following;
+
+        return {
+          ...data,
+          following: !isFollowing,
+          followersCount: isFollowing
+            ? (data.followersCount ?? 0) - 1
+            : (data.followersCount ?? 0) + 1,
+        };
+      });
+      return { previousProfile };
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: PROFILE_QUERY_KEY.profile(id as string),
+      });
+    },
+    onError: (_, id, context) => {
+      const key = PROFILE_QUERY_KEY.profile(id);
+      queryClient.setQueryData(key, context?.previousProfile);
+    },
+  });
+
   const isCurrentUser = useMemo(() => {
     if (!user || !profile) return false;
     return user?.id === profile?.id;
@@ -114,5 +158,7 @@ export const useProfile = (id?: string) => {
     isSettingMainPhoto,
     deletePhoto,
     isDeletingPhoto,
+    followUser,
+    isFollowingUser,
   };
 };

@@ -11,19 +11,20 @@ import {
   updateActivity as updateActivityApi,
   updateAttendee as updateAttendeeApi,
 } from "../api/activities";
+import { ActivityFormValues } from "../schemas/activity";
 
-const activityQueryKeys = {
+export const ACTIVITY_QUERY_KEY = {
   all: ["activities"] as const,
-  lists: () => [...activityQueryKeys.all, "list"],
-  details: (id?: string) => [...activityQueryKeys.lists(), "details", id], // ['activities', 'id']
+  lists: () => [...ACTIVITY_QUERY_KEY.all, "list"],
+  details: (id?: string) => [...ACTIVITY_QUERY_KEY.lists(), "details", id], // ['activities', 'id']
 } as const;
 
 export const useActivities = (id?: string) => {
   const queryClient = useQueryClient();
-  const user = queryClient.getQueryData<User>(["user"]);
+  const user = queryClient.getQueryData<User>(["account"]);
 
   const { data = [], isPending } = useQuery({
-    queryKey: activityQueryKeys.lists(),
+    queryKey: ACTIVITY_QUERY_KEY.lists(),
     queryFn: getActivities,
     select: (data) => {
       if (!data) return [];
@@ -38,7 +39,7 @@ export const useActivities = (id?: string) => {
   });
 
   const { data: activity, isPending: isLoadingActivity } = useQuery({
-    queryKey: activityQueryKeys.details(id),
+    queryKey: ACTIVITY_QUERY_KEY.details(id),
     queryFn: id ? () => getActivityById(id) : skipToken,
     enabled: !!id,
     select: (data) => {
@@ -53,9 +54,9 @@ export const useActivities = (id?: string) => {
 
   const { mutate: createActivity, isPending: isCreatingActivity } = useMutation(
     {
-      mutationFn: (activity: Activity) => createActivityApi(activity),
+      mutationFn: (activity: ActivityFormValues) => createActivityApi(activity),
       onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: activityQueryKeys.lists() });
+        queryClient.invalidateQueries({ queryKey: ACTIVITY_QUERY_KEY.lists() });
       },
     }
   );
@@ -63,12 +64,17 @@ export const useActivities = (id?: string) => {
   // update activity
   const { mutate: updateActivity, isPending: isUpdatingActivity } = useMutation(
     {
-      mutationFn: ({ id, activity }: { id: string; activity: Activity }) =>
-        updateActivityApi(id, activity),
+      mutationFn: ({
+        id,
+        activity,
+      }: {
+        id: string;
+        activity: ActivityFormValues;
+      }) => updateActivityApi(id, activity),
       onSuccess: (_, variable) => {
-        queryClient.invalidateQueries({ queryKey: activityQueryKeys.lists() });
+        queryClient.invalidateQueries({ queryKey: ACTIVITY_QUERY_KEY.lists() });
         queryClient.invalidateQueries({
-          queryKey: activityQueryKeys.details(variable.id),
+          queryKey: ACTIVITY_QUERY_KEY.details(variable.id),
         });
       },
     }
@@ -78,7 +84,7 @@ export const useActivities = (id?: string) => {
     {
       mutationFn: (activityId: string) => updateAttendeeApi(activityId),
       onMutate: async (activityId: string) => {
-        const key = activityQueryKeys.details(activityId);
+        const key = ACTIVITY_QUERY_KEY.details(activityId);
         await queryClient.cancelQueries({ queryKey: key });
         const previousActivity = queryClient.getQueryData<Activity>(key);
 
@@ -107,13 +113,14 @@ export const useActivities = (id?: string) => {
         return { previousActivity };
       },
       onSuccess: (_, activityId) => {
+        queryClient.invalidateQueries({ queryKey: ACTIVITY_QUERY_KEY.all });
         queryClient.invalidateQueries({
-          queryKey: activityQueryKeys.details(activityId),
+          queryKey: ACTIVITY_QUERY_KEY.details(activityId),
         });
       },
       onError: (_, activityId, context) => {
         queryClient.setQueryData(
-          activityQueryKeys.details(activityId),
+          ACTIVITY_QUERY_KEY.details(activityId),
           context?.previousActivity
         );
       },

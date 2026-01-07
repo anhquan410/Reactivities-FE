@@ -10,8 +10,7 @@ type Props = {
 
 export default function ActivityDetailsHeader({ activity }: Props) {
   const { updateAttendee, isUpdatingAttendee } = useActivities(activity.id);
-  // console.log(activity);
-  // console.log(profile);
+  console.log(activity);
 
   return (
     <Card

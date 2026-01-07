@@ -2,6 +2,11 @@ import { useParams } from "react-router";
 import {
   Box,
   Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Divider,
   ImageList,
   ImageListItem,
@@ -11,7 +16,7 @@ import { useCallback, useState } from "react";
 import { useProfile } from "@/libs/hooks/useProfiile";
 import PhotoUploadWidget from "@/shared/components/PhotoUploadWidget";
 import StarButton from "@/shared/components/StartButton";
-import DeleteButton from "@/shared/components/DEleteButton";
+import DeleteButton from "@/shared/components/DeleteButton";
 
 export default function ProfilePhotos() {
   const { id } = useParams();
@@ -19,6 +24,7 @@ export default function ProfilePhotos() {
     useProfile(id);
 
   const [editMode, setEditMode] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const handleUpload = useCallback(
     async (file: Blob) => {
@@ -32,7 +38,17 @@ export default function ProfilePhotos() {
   );
 
   const handleDelete = (photoId: string) => {
-    deletePhoto(photoId);
+    setDeleteConfirm(photoId);
+  };
+  const confirmDelete = () => {
+    if (deleteConfirm) {
+      deletePhoto(deleteConfirm);
+      setDeleteConfirm(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setDeleteConfirm(null);
   };
 
   return (
@@ -77,6 +93,25 @@ export default function ProfilePhotos() {
                       <DeleteButton />
                     </Box>
                   )}
+                  <Dialog open={!!deleteConfirm} onClose={cancelDelete}>
+                    <DialogTitle>Delete Photo</DialogTitle>
+                    <DialogContent>
+                      <DialogContentText>
+                        Are you sure you want to delete this photo? This action
+                        cannot be undone.
+                      </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={cancelDelete}>Cancel</Button>
+                      <Button
+                        onClick={confirmDelete}
+                        color="error"
+                        variant="contained"
+                      >
+                        Delete
+                      </Button>
+                    </DialogActions>
+                  </Dialog>
                 </ImageListItem>
               ))}
             </>

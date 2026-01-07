@@ -1,60 +1,79 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 /* eslint-disable no-empty-pattern */
-import { useActivities } from "@/libs/hooks/useActivities";
-import { Box, Button, Paper, TextField, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
+import { Box, Button, Paper, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "./../../../../node_modules/@hookform/resolvers/zod/src/zod";
+import { ActivityFormValues, activitySchema } from "@/libs/schemas/activity";
+import { useActivities } from "@/libs/hooks/useActivities";
+import { useEffect } from "react";
+import TextInput from "@/shared/components/TextInput";
 
 type Props = {};
 
 export default function ActivityForm({}: Props) {
+  const { handleSubmit, reset, control } = useForm<ActivityFormValues>({
+    resolver: zodResolver(activitySchema),
+    defaultValues: {
+      title: "",
+      description: "",
+      category: "",
+      date: new Date().toISOString().split("T")[0],
+      city: "",
+      venue: "",
+    },
+  });
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
-  const { createActivity, activity, updateActivity } = useActivities(id);
+  const { activity, createActivity, updateActivity } = useActivities(id);
 
-  //Form State
-  const [formValue, setFormValue] = useState({
-    title: "",
-    description: "",
-    category: "",
-    date: "",
-    city: "",
-    venue: "",
-  });
-
-  // Update form values when activity data loads (for edit mode)
   useEffect(() => {
-    if (activity && isEdit) {
-      setFormValue({
-        title: activity.title || "",
-        description: activity.description || "",
-        category: activity.category || "",
-        date: activity.date
-          ? new Date(activity.date).toISOString().split("T")[0]
-          : "",
-        city: activity.city || "",
-        venue: activity.venue || "",
-      });
+    if (isEdit && activity) {
+      const defaultValues = {
+        title: activity.title,
+        description: activity.description,
+        category: activity.category,
+        date: new Date(activity.date).toISOString().split("T")[0], // Convert to YYYY-MM-DD
+        city: activity.city,
+        venue: activity.venue,
+      };
+      reset(defaultValues);
     }
-  }, [activity, isEdit]);
-
-  // Handle form field changes
-  const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormValue((prev) => ({ ...prev, [name]: value }));
-  };
+  }, [isEdit, activity, reset]);
 
   // Handle submit button click
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const activityData = { ...formValue };
+  // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
+  //   const activityData = { ...formValue };
 
+  //   if (isEdit) {
+  //     updateActivity(
+  //       { id: id!, activity: activityData as unknown as Activity },
+  //       {
+  //         onSuccess: () => {
+  //           navigate(`/activities/${id}`);
+  //         },
+  //         onError: (error, variable, context) => {
+  //           console.log(error, variable, context);
+  //         },
+  //       }
+  //     );
+  //   } else {
+  //     createActivity(activityData as unknown as Activity, {
+  //       onSuccess: () => {
+  //         navigate("/activities");
+  //       },
+  //       onError: (error, variable, context) => {
+  //         console.log(error, variable, context);
+  //       },
+  //     });
+  //   }
+  // };
+  const onSubmit = (activityData: ActivityFormValues) => {
     if (isEdit) {
       updateActivity(
-        { id: id!, activity: activityData as unknown as Activity },
+        { id: id!, activity: activityData },
         {
           onSuccess: () => {
             navigate(`/activities/${id}`);
@@ -65,7 +84,7 @@ export default function ActivityForm({}: Props) {
         }
       );
     } else {
-      createActivity(activityData as unknown as Activity, {
+      createActivity(activityData, {
         onSuccess: () => {
           navigate("/activities");
         },
@@ -95,47 +114,20 @@ export default function ActivityForm({}: Props) {
         display="flex"
         flexDirection="column"
         gap={3}
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
       >
-        <TextField
-          name="title"
-          label="Title"
-          value={formValue.title}
-          onChange={handleInputChange}
-        />
-        <TextField
-          name="description"
+        <TextInput label="Title" name="title" control={control} />
+        <TextInput
           label="Description"
+          name="description"
+          control={control}
           multiline
           rows={3}
-          value={formValue.description}
-          onChange={handleInputChange}
         />
-        <TextField
-          name="category"
-          label="Category"
-          value={formValue.category}
-          onChange={handleInputChange}
-        />
-        <TextField
-          name="date"
-          label="Date"
-          type="date"
-          value={formValue.date}
-          onChange={handleInputChange}
-        />
-        <TextField
-          name="city"
-          label="City"
-          value={formValue.city}
-          onChange={handleInputChange}
-        />
-        <TextField
-          name="venue"
-          label="Venue"
-          value={formValue.venue}
-          onChange={handleInputChange}
-        />
+        <TextInput label="Category" name="category" control={control} />
+        <TextInput label="Date" name="date" type="date" control={control} />
+        <TextInput label="City" name="city" control={control} />
+        <TextInput label="Venue" name="venue" control={control} />
         <Box display="flex" justifyContent="end" gap={3}>
           <Button color="inherit" onClick={handleCancel}>
             Cancel

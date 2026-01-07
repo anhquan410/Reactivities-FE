@@ -1,3 +1,4 @@
+import { ActivityFormValues } from "../schemas/activity";
 import agent from "./agent";
 
 export async function getActivities() {
@@ -18,7 +19,7 @@ export async function getActivityById(id: string) {
   }
 }
 
-export async function createActivity(activity: Activity) {
+export async function createActivity(activity: ActivityFormValues) {
   try {
     const response = await agent.post(`/activities`, activity);
     return response.data;
@@ -27,7 +28,7 @@ export async function createActivity(activity: Activity) {
   }
 }
 
-export async function updateActivity(id: string, activity: Activity) {
+export async function updateActivity(id: string, activity: ActivityFormValues) {
   try {
     const response = await agent.patch(`/activities/${id}`, activity);
     return response.data;

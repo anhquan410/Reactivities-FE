@@ -18,8 +18,9 @@ type Props = {
 };
 
 export default function ActivityDetailsSidebar({ activity }: Props) {
-  // console.log(activity);
+  console.log(activity);
   const following = true;
+  
   return (
     <>
       <Paper

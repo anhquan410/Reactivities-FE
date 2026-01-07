@@ -51,3 +51,10 @@
 - [ ] Profile Photos:
   - [x] Set main photo (use optimistic update) + update avatar on header
   - [x] Delete photo - can not delete main photo + use optimistic update - API: DELETE /api/profiles/photo/:photoId
+
+ // 5
+  - [x] Implement follow feature: API: POST /api/profiles/:profileId/follow ( check full workflow of follow feature)
+  - [ ] Create DateTimeInput using react hook form (useController): https://v6.mui.com/x/react-date-pickers/date-time-picker/
+  - [ ] Validate Login + Register form (zod validation + react hook form to reuse components)
+  - [ ] Complete ActivityForm (Create + Edit)
+  - [ ] Investigate how to manage state on url (urlSearchParams)
