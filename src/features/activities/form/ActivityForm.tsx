@@ -8,8 +8,20 @@ import { ActivityFormValues, activitySchema } from "@/libs/schemas/activity";
 import { useActivities } from "@/libs/hooks/useActivities";
 import { useEffect } from "react";
 import TextInput from "@/shared/components/TextInput";
+import SelectInput from "@/shared/components/SelectInput";
 
 type Props = {};
+
+export const categoryOptions = [
+  { text: "Music", value: "music" },
+  { text: "Art", value: "art" },
+  { text: "Food", value: "food" },
+  { text: "Drinks", value: "drinks" },
+  { text: "Culture", value: "culture" },
+  { text: "Travel", value: "travel" },
+  { text: "Sports", value: "sports" },
+  { text: "Other", value: "other" },
+];
 
 export default function ActivityForm({}: Props) {
   const { handleSubmit, reset, control } = useForm<ActivityFormValues>({
@@ -124,7 +136,12 @@ export default function ActivityForm({}: Props) {
           multiline
           rows={3}
         />
-        <TextInput label="Category" name="category" control={control} />
+        <SelectInput
+          options={categoryOptions}
+          label="Category"
+          control={control}
+          name="category"
+        />
         <TextInput label="Date" name="date" type="date" control={control} />
         <TextInput label="City" name="city" control={control} />
         <TextInput label="Venue" name="venue" control={control} />
