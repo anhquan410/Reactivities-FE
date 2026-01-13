@@ -1,62 +1,67 @@
 import { useActivities } from "@/libs/hooks/useActivities";
-import { Box, Typography, CircularProgress } from "@mui/material";
-import InfiniteScroll from "react-infinite-scroller";
+import { Box, Typography } from "@mui/material";
+import { useInView } from "react-intersection-observer";
 
+import { useEffect } from "react";
 import ActivityCard from "./ActivityCard";
+import ActivityCardSkeleton from "./ActivityCardSkeleton";
+import ActivityListSkeleton from "./ActivityListSkeleton";
 
 export default function ActivityList() {
   const {
     activitiesGrouped,
     isPending,
-    fetchNextPage,
+
     hasNextPage,
+    fetchNextPage,
     isFetchingNextPage,
   } = useActivities();
+  const { ref, inView } = useInView({
+    threshold: 0.8,
+  });
 
-  const handleLoadMore = () => {
-    if (hasNextPage && !isFetchingNextPage) {
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
-  };
+  }, [inView, hasNextPage, fetchNextPage, isFetchingNextPage]);
 
-  if (isPending) return <Typography variant="h5">Loading...</Typography>;
+  if (isPending) return <ActivityListSkeleton />;
 
   if (!activitiesGrouped)
     return <Typography variant="h5">No activities found</Typography>;
 
+  const lastPageIndex = activitiesGrouped.pages.length - 1;
+  const lastPage = activitiesGrouped.pages[lastPageIndex];
+  const lastActivityIndex = lastPage.items?.length
+    ? lastPage.items.length - 1
+    : 0;
+
   return (
-    <InfiniteScroll
-      pageStart={0}
-      loadMore={handleLoadMore}
-      hasMore={hasNextPage}
-      loader={
-        <Box
-          key="loader"
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            py: 2,
-          }}
-        >
-          <CircularProgress size={24} />
-          <Typography variant="body2" sx={{ ml: 1 }}>
-            Loading more activities...
-          </Typography>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
+      {activitiesGrouped.pages.map((activities, pageIndex) => (
+        <Box key={pageIndex} display="flex" flexDirection="column" gap={3}>
+          {activities.items?.map((activity, activityIndex) => {
+            const isLastActivity =
+              pageIndex === lastPageIndex &&
+              activityIndex === lastActivityIndex;
+
+            const activityRef =
+              isLastActivity && hasNextPage && !isFetchingNextPage ? ref : null;
+
+            return (
+              <Box ref={activityRef} key={activity.id}>
+                <ActivityCard activity={activity} />
+                {isLastActivity && isFetchingNextPage && (
+                  <Box sx={{ mt: 2 }}>
+                    <ActivityCardSkeleton />
+                  </Box>
+                )}
+              </Box>
+            );
+          })}
         </Box>
-      }
-      useWindow={true}
-      threshold={250}
-    >
-      <Box sx={{ display: "flex", flexDirection: "column", gap: 3 }}>
-        {activitiesGrouped.pages.map((activities, index) => (
-          <Box key={index} display="flex" flexDirection="column" gap={3}>
-            {activities?.items?.map((activity) => (
-              <ActivityCard key={activity.id} activity={activity} />
-            ))}
-          </Box>
-        ))}
-      </Box>
-    </InfiniteScroll>
+      ))}
+    </Box>
   );
 }
