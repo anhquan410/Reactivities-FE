@@ -3,6 +3,7 @@ import {
   skipToken,
   useMutation,
   useQueryClient,
+  useInfiniteQuery,
 } from "@tanstack/react-query";
 import {
   getActivities,
@@ -23,19 +24,38 @@ export const useActivities = (id?: string) => {
   const queryClient = useQueryClient();
   const user = queryClient.getQueryData<User>(["account"]);
 
-  const { data = [], isPending } = useQuery({
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetching,
+    isPending,
+  } = useInfiniteQuery({
     queryKey: ACTIVITY_QUERY_KEY.lists(),
-    queryFn: getActivities,
-    select: (data) => {
-      if (!data) return [];
-      return data?.map((activity) => {
-        return {
-          ...activity,
-          isGoing: activity.attendees.some((a) => a.id === user?.id),
-          isHost: activity.hostId === user?.id,
-        };
-      });
+    queryFn: ({ pageParam }: { pageParam: string | null }) =>
+      getActivities({ cursor: pageParam as string }),
+    initialPageParam: null,
+    getNextPageParam: (lastPage) => {
+      return lastPage?.pageInfo.nextCursor;
     },
+    select: (data) => ({
+      ...data,
+      pages: data.pages.map((page) => ({
+        ...page,
+        items: page?.items.map((activity) => {
+          const host = activity.attendees.find(
+            (x) => x.id === activity.host.id
+          );
+          return {
+            ...activity,
+            isHost: user?.id === activity.hostId,
+            isGoing: activity.attendees.some((x) => x.id === user?.id),
+            hostImageUrl: host?.imageUrl,
+          };
+        }),
+      })),
+    }),
   });
 
   const { data: activity, isPending: isLoadingActivity } = useQuery({
@@ -128,7 +148,7 @@ export const useActivities = (id?: string) => {
   );
 
   return {
-    activities: data,
+    activitiesGrouped: data,
     activity,
     isPending,
     isLoadingActivity,
@@ -138,5 +158,9 @@ export const useActivities = (id?: string) => {
     isUpdatingActivity,
     updateAttendee,
     isUpdatingAttendee,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isFetching,
   };
 };

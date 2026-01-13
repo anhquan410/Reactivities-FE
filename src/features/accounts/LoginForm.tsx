@@ -3,11 +3,35 @@ import TextField from "@mui/material/TextField";
 import { Link, useNavigate } from "react-router";
 import LockOpen from "@mui/icons-material/LockOpen";
 import { useAccount } from "@/libs/hooks/useAccount";
+// import { useForm } from "react-hook-form";
+// import { zodResolver } from "@hookform/resolvers/zod/src/zod.js";
+// import { LoginFormValues, loginSchema } from "@/libs/schemas/login";
 
 export default function LoginForm() {
   const { loginUser } = useAccount();
   const navigate = useNavigate();
+  // const { handleSubmit } = useForm({
+  //   resolver: zodResolver(loginSchema),
+  // });
 
+  // const onSubmit = (loginData: LoginFormValues) => {
+  //   loginUser.mutateAsync(
+  //     {
+  //       email: loginData.email as string,
+  //       password: loginData.password as string,
+  //     },
+  //     {
+  //       onSuccess: () => {
+  //         // Handle successful login, e.g., redirect or show a message
+  //         navigate("/activities");
+  //       },
+  //       onError: (error) => {
+  //         console.log(error);
+  //         // Handle login error, e.g., show an error message    },
+  //       },
+  //     }
+  //   );
+  // };
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);

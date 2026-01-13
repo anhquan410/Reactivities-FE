@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /* eslint-disable @typescript-eslint/no-empty-object-type */
 /* eslint-disable no-empty-pattern */
 import { Box, Button, Paper, Typography } from "@mui/material";
@@ -9,6 +10,10 @@ import { useActivities } from "@/libs/hooks/useActivities";
 import { useEffect } from "react";
 import TextInput from "@/shared/components/TextInput";
 import SelectInput from "@/shared/components/SelectInput";
+// import DateTimeInput from "@/shared/components/DateTimeInput";
+// import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
+// import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+// import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 type Props = {};
 
@@ -54,34 +59,6 @@ export default function ActivityForm({}: Props) {
     }
   }, [isEdit, activity, reset]);
 
-  // Handle submit button click
-  // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-  //   e.preventDefault();
-  //   const activityData = { ...formValue };
-
-  //   if (isEdit) {
-  //     updateActivity(
-  //       { id: id!, activity: activityData as unknown as Activity },
-  //       {
-  //         onSuccess: () => {
-  //           navigate(`/activities/${id}`);
-  //         },
-  //         onError: (error, variable, context) => {
-  //           console.log(error, variable, context);
-  //         },
-  //       }
-  //     );
-  //   } else {
-  //     createActivity(activityData as unknown as Activity, {
-  //       onSuccess: () => {
-  //         navigate("/activities");
-  //       },
-  //       onError: (error, variable, context) => {
-  //         console.log(error, variable, context);
-  //       },
-  //     });
-  //   }
-  // };
   const onSubmit = (activityData: ActivityFormValues) => {
     if (isEdit) {
       updateActivity(
@@ -142,6 +119,11 @@ export default function ActivityForm({}: Props) {
           control={control}
           name="category"
         />
+        {/* <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DemoContainer components={["DateTimePicker"]}>
+            <DateTimeInput label="Date" name="date" control={control} />
+          </DemoContainer>
+        </LocalizationProvider> */}
         <TextInput label="Date" name="date" type="date" control={control} />
         <TextInput label="City" name="city" control={control} />
         <TextInput label="Venue" name="venue" control={control} />

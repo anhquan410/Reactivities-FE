@@ -60,5 +60,4 @@
 - [x] Complete ActivityForm (Create + Edit)
 - [ ] Investigate how to manage state on url (urlSearchParams)
 
-/
 

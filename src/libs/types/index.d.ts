@@ -50,3 +50,11 @@ type Profile = User & {
   followingCount?: number;
   following?: boolean;
 };
+
+type CursorPagedList<T> = {
+  items: T[];
+  pageInfo: {
+    hasNextPage: boolean;
+    nextCursor: string;
+  };
+};

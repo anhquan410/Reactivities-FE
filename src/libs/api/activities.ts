@@ -1,9 +1,11 @@
 import { ActivityFormValues } from "../schemas/activity";
 import agent from "./agent";
 
-export async function getActivities() {
+export async function getActivities({ cursor }: { cursor: string }) {
   try {
-    const response = await agent.get<Activity[]>(`/activities`);
+    const response = await agent.get<CursorPagedList<Activity>>(`/activities`, {
+      params: { cursor },
+    });
     return response.data;
   } catch (error) {
     console.log(error);
